@@ -12,15 +12,21 @@ export default ({
   const [currentIndex, setCurrentIndex] = useState(-1);
 
   useEffect(() => {
-    const { length } = lrcLineList;
-    let i = 0;
-    for (; i < length; i += 1) {
-      const { millisecond } = lrcLineList[i];
-      if (currentTime < millisecond) {
-        break;
+    let isUnmount = false;
+    if (!isUnmount) {
+      const { length } = lrcLineList;
+      let i = 0;
+      for (; i < length; i += 1) {
+        const { millisecond } = lrcLineList[i];
+        if (currentTime < millisecond) {
+          break;
+        }
       }
+      setCurrentIndex(i - 1);
     }
-    setCurrentIndex(i - 1);
+    return () => {
+      isUnmount = true;
+    };
   }, [currentTime, lrcLineList]);
 
   return currentIndex;

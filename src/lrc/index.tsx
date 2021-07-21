@@ -75,32 +75,38 @@ const Lrc = React.forwardRef<
   const lrcLineList = useLrc(lrc);
 
   const currentIndex = useCurrentIndex({ lrcLineList, currentTime });
-  const {
-    localAutoScroll,
-    resetLocalAutoScroll,
-    onScroll,
-  } = useLocalAutoScroll({
-    autoScroll,
-    autoScrollAfterUserScroll,
-  });
+  const { localAutoScroll, resetLocalAutoScroll, onScroll } =
+    useLocalAutoScroll({
+      autoScroll,
+      autoScrollAfterUserScroll,
+    });
 
   // auto scroll
   useEffect(() => {
-    if (localAutoScroll) {
+    let isUnmount = false;
+    if (localAutoScroll && !isUnmount) {
       lrcRef.current?.scrollTo({
         y: currentIndex * lineHeight || 0,
         animated: true,
       });
     }
+    return () => {
+      isUnmount = true;
+    };
   }, [currentIndex, localAutoScroll, lineHeight]);
 
   // on current line change
   useEffect(() => {
-    onCurrentLineChange &&
+    let isUnmount = false;
+    if (onCurrentLineChange && !isUnmount) {
       onCurrentLineChange({
         index: currentIndex,
         lrcLine: lrcLineList[currentIndex] || null,
       });
+    }
+    return () => {
+      isUnmount = true;
+    };
   }, [lrcLineList, currentIndex, onCurrentLineChange]);
 
   useImperativeHandle(ref, () => ({
